@@ -11,7 +11,7 @@
 //!
 //! The default port is 7471.
 
-use rdma_sys::*;
+use rdma_mummy_sys::*;
 use std::ptr::null_mut;
 
 static SERVER: &str = "0.0.0.0\0";

@@ -11,10 +11,10 @@
 //!
 //! The default port is 7471.
 
-use rdma_sys::*;
-use std::{env, process::exit, ptr::null_mut};
+use rdma_mummy_sys::*;
+use std::{env, ffi::CString, process::exit, ptr::null_mut};
 
-fn run(ip: &str, port: &str) -> i32 {
+fn run(ip: &CString, port: &CString) -> i32 {
     let mut send_msg = vec![1_u8; 16];
     let mut recv_msg = vec![0_u8; 16];
     let mut hints = unsafe { std::mem::zeroed::<rdma_addrinfo>() };
@@ -141,14 +141,14 @@ fn run(ip: &str, port: &str) -> i32 {
 
 fn main() {
     println!("rdma_client: start");
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<CString> = env::args().map(|arg| CString::new(arg).unwrap()).collect();
     if args.len() != 3 {
         println!("usage : cargo run --example client <server_ip> <port>");
         println!("input : {:?}", args);
         exit(-1);
     }
-    let ip = args.get(1).unwrap().as_str();
-    let port = args.get(2).unwrap().as_str();
+    let ip = args.get(1).unwrap();
+    let port = args.get(2).unwrap();
 
     let ret = run(ip, port);
 

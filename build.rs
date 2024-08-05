@@ -1,50 +1,23 @@
+use cmake::Config;
 use std::env;
-use std::path::Path;
-
-fn link_rdma_core(lib_name: &str, pkg_name: &str, version: &str, include_paths: &mut Vec<String>) {
-    let result: _ = pkg_config::Config::new()
-        .atleast_version(version)
-        .statik(false)
-        .probe(lib_name);
-
-    let lib = result.unwrap_or_else(|_| panic!("please install {pkg_name} {version})"));
-    println!("found {pkg_name} {}", lib.version);
-
-    for path in lib.include_paths {
-        let path = path.to_str().expect("non-utf8 path");
-        include_paths.push(path.to_owned());
-    }
-}
+use std::path::PathBuf;
 
 fn main() {
-    let mut include_paths: Vec<String> = Vec::new();
+    let dst = Config::new("rdma-core-mummy")
+        .define("CMAKE_BUILD_TYPE", "RelWithDebInfo")
+        .build_target("all")
+        .build();
 
-    {
-        let lib_name = "libibverbs";
-        let pkg_name = "libibverbs-dev";
-        let version = "1.8.28";
-        link_rdma_core(lib_name, pkg_name, version, &mut include_paths);
-    }
-
-    {
-        let lib_name = "librdmacm";
-        let pkg_name = "librdmacm-dev";
-        let version = "1.2.28";
-        link_rdma_core(lib_name, pkg_name, version, &mut include_paths);
-    }
-
-    {
-        include_paths.sort_unstable();
-        include_paths.dedup_by(|x, first| x == first);
-        include_paths.push("/usr/include".into());
-        println!("include paths: {:?}", include_paths);
-    }
-
-    let include_args = include_paths.iter().map(|p| format!("-I{}", p));
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("build").display()
+    );
+    println!("cargo:rustc-link-lib=static=ibverbs");
+    println!("cargo:rustc-link-lib=static=rdmacm");
 
     let bindings = bindgen::Builder::default()
-        .clang_args(include_args)
         .header("src/bindings.h")
+        .clang_arg("-F./rdma-core-mummy/include")
         .allowlist_function("ibv_.*")
         .allowlist_type("ibv_.*")
         .allowlist_function("rdma_.*")
@@ -148,16 +121,15 @@ fn main() {
         //.generate_inline_functions(true)
         //.default_macro_constant_type(bindgen::MacroTypeVariation::Unsigned)
         .prepend_enum_name(false)
-        .rustfmt_bindings(true)
+        .formatter(bindgen::Formatter::Prettyplease)
         .size_t_is_usize(true)
         .disable_untagged_union()
         .generate()
         .expect("Unable to generate bindings");
 
-    let out_dir = env::var_os("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("bindings.rs");
+    let dest_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("bindings.rs");
 
     bindings
         .write_to_file(dest_path)
-        .expect("Could not write bindings");
+        .expect("Couldn't write bindings");
 }

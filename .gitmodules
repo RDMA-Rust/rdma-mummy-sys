@@ -1,4 +1,4 @@
-[submodule "rdma-env-setup"]
-	path = rdma-env-setup
-	url = https://github.com/datenlord/rdma-env-setup.git
+[submodule "rdma-core-mummy"]
+	path = rdma-core-mummy
+	url = git@github.com:RDMA-Rust/rdma-core-mummy.git
 	branch = main

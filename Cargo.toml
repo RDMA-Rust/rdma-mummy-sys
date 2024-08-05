@@ -1,19 +1,22 @@
 [package]
-name = "rdma-sys"
-version = "0.3.0"
-authors = ["Pu Wang <nicolas.weeks@gmail.com>"]
+name = "rdma-mummy-sys"
+version = "0.1.0"
+authors = [
+    "Luke Yue <lukedyue@gmail.com>",
+    "Pu Wang <nicolas.weeks@gmail.com>"
+]
 edition = "2021"
-description = "Rdma ibverbs lib Rust binding"
+description = "rdma-core-mummy Rust binding"
 license-file = "LICENSE"
-repository = "https://github.com/datenlord/rdma-sys"
+repository = "https://github.com/RDMA-Rust/rdma-mummy-sys"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 libc = "0.2"
-memoffset = "0.6"
+memoffset = "0.9"
 paste = "1.0"
 # intrusive-collections = "0.9"
 
 [build-dependencies]
-bindgen = "0.59.2"
-pkg-config = "0.3"
+cmake = "0.1"
+bindgen = { version = "0.66", features = ["prettyplease"] }

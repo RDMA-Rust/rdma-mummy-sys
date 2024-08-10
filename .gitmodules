@@ -1,4 +1,4 @@
 [submodule "rdma-core-mummy"]
 	path = rdma-core-mummy
-	url = git@github.com:RDMA-Rust/rdma-core-mummy.git
+	url = https://github.com/RDMA-Rust/rdma-core-mummy.git
 	branch = main

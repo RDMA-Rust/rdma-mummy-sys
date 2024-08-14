@@ -20,6 +20,17 @@ pub union ibv_gid {
     pub global: ibv_gid_global_t,
 }
 
+#[repr(C)]
+#[derive(Clone, Copy)]
+#[allow(dead_code)]
+pub struct ibv_gid_entry {
+    pub gid: ibv_gid,
+    pub gid_index: u32,
+    pub port_num: u32,
+    pub gid_type: u32,
+    pub ndev_ifindex: u32,
+}
+
 // ibv_async_event related union and struct type
 #[repr(C)]
 pub union ibv_async_event_element_t {

@@ -260,7 +260,7 @@ macro_rules! container_of {
 // Utility function to get verbs_context from ibv_context
 #[inline]
 unsafe fn verbs_get_ctx(ctx: *const ibv_context) -> Option<*mut verbs_context> {
-    if (*ctx).abi_compat as usize != u32::MAX as usize {
+    if (*ctx).abi_compat as usize != usize::MAX {
         None
     } else {
         let vcp = container_of!(ctx, verbs_context, context) as *mut _;

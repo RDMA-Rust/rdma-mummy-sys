@@ -1365,3 +1365,7 @@ pub unsafe fn rdma_get_recv_comp(id: *mut rdma_cm_id, wc: *mut ibv_wc) -> c_int 
         ret
     }
 }
+
+pub const IBV_LINK_LAYER_UNSPECIFIED: u8 = 0;
+pub const IBV_LINK_LAYER_INFINIBAND: u8 = 1;
+pub const IBV_LINK_LAYER_ETHERNET: u8 = 2;

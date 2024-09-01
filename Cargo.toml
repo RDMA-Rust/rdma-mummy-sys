@@ -3,7 +3,8 @@ name = "rdma-mummy-sys"
 version = "0.1.0"
 authors = [
     "Luke Yue <lukedyue@gmail.com>",
-    "Pu Wang <nicolas.weeks@gmail.com>"
+    "Pu Wang <nicolas.weeks@gmail.com>",
+    "FujiZ <i@fujiz.me>"
 ]
 edition = "2021"
 description = "rdma-core-mummy Rust binding"

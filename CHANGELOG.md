@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 31 commits contributed to the release.
+ - 32 commits contributed to the release.
  - 7 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 5 unique issues were worked on: [#10](https://github.com/RDMA-Rust/rdma-mummy-sys/issues/10), [#14](https://github.com/RDMA-Rust/rdma-mummy-sys/issues/14), [#19](https://github.com/RDMA-Rust/rdma-mummy-sys/issues/19), [#20](https://github.com/RDMA-Rust/rdma-mummy-sys/issues/20), [#22](https://github.com/RDMA-Rust/rdma-mummy-sys/issues/22)
 
@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * **[#22](https://github.com/RDMA-Rust/rdma-mummy-sys/issues/22)**
     - Change `ibv_evnet_type` from u32 to rust enum. ([`8bdaed8`](https://github.com/RDMA-Rust/rdma-mummy-sys/commit/8bdaed8f4353114ca962f12a7376ba03fdf45d2f))
  * **Uncategorized**
+    - Release rdma-mummy-sys v0.1.0 ([`c8ade64`](https://github.com/RDMA-Rust/rdma-mummy-sys/commit/c8ade64d34edc1e3165b2d9ec9acd0b2915ba17c))
     - Add FujiZ as one of the authors ([`42c6c8c`](https://github.com/RDMA-Rust/rdma-mummy-sys/commit/42c6c8c08b22cb2c420720e683834fbcc78a83e9))
     - Generate link layer type manually as they are anonymous enum ([`b4f582b`](https://github.com/RDMA-Rust/rdma-mummy-sys/commit/b4f582b6db08a908b883c4b023d1f0c283bde521))
     - Upgrade rdma-core-mummy for ibv_query_table ([`beda7f4`](https://github.com/RDMA-Rust/rdma-mummy-sys/commit/beda7f4e9e9201be11d65c8454cf94c97692a024))

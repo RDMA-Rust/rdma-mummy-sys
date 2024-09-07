@@ -291,38 +291,6 @@ macro_rules! verbs_get_ctx_op {
 // __ibv_get_device_list, __ibv_reg_mr, and __ibv_reg_mr_iova in C, which
 // should be handled properly in Rust.
 
-// When statically linking the user can set RDMA_STATIC_PROVIDERS to a comma
-// separated list of provider names to include in the static link, and this
-// machinery will cause those providers to be included statically.
-//
-// Linking will fail if this is set for dynamic linking.
-//
-// #define ibv_get_device_list(num_devices) __ibv_get_device_list(num_devices)
-// #endif
-// #ifdef RDMA_STATIC_PROVIDERS
-// #define _RDMA_STATIC_PREFIX_(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11,     \
-//                              _12, _13, _14, _15, _16, _17, ...)                \
-//         &verbs_provider_##_1, &verbs_provider_##_2, &verbs_provider_##_3,      \
-//                 &verbs_provider_##_4, &verbs_provider_##_5,                    \
-//                 &verbs_provider_##_6, &verbs_provider_##_7,                    \
-//                 &verbs_provider_##_8, &verbs_provider_##_9,                    \
-//                 &verbs_provider_##_10, &verbs_provider_##_11,                  \
-//                 &verbs_provider_##_12, &verbs_provider_##_13,                  \
-//                 &verbs_provider_##_14, &verbs_provider_##_15,                  \
-//                 &verbs_provider_##_16, &verbs_provider_##_17
-// #define _RDMA_STATIC_PREFIX(arg)                                               \
-//         _RDMA_STATIC_PREFIX_(arg, none, none, none, none, none, none, none,    \
-//                              none, none, none, none, none, none, none, none,   \
-//                              none)
-pub unsafe fn __ibv_get_device_list(num_devices: *mut c_int) -> *mut *mut ibv_device {
-    // TODO: check static linking compatibility
-    // ibv_static_providers(NULL, _RDMA_STATIC_PREFIX(RDMA_STATIC_PROVIDERS), NULL);
-    ibv_get_device_list(num_devices)
-}
-
-// TODO: missing variable args function
-// void ibv_static_providers(void *unused, ...);
-
 // ibv_context related inline function
 #[inline]
 pub unsafe fn ___ibv_query_port(
@@ -337,7 +305,7 @@ pub unsafe fn ___ibv_query_port(
     } else {
         // TODO: memset(port_attr, 0, sizeof(*port_attr));
         let compat_attr = port_attr as *mut _ as *mut _compat_ibv_port_attr;
-        ibv_query_port(context, port_num, compat_attr)
+        ibv_query_port_compat(context, port_num, compat_attr)
     }
 }
 
@@ -614,14 +582,14 @@ pub unsafe fn ibv_reg_dm_mr(
 pub unsafe fn ibv_create_cq_ex(
     context: *mut ibv_context,
     cq_attr: *mut ibv_cq_init_attr_ex,
-) -> Option<*mut ibv_cq_ex> {
+) -> *mut ibv_cq_ex {
     let vcr = verbs_get_ctx_op!(context, create_cq_ex);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).create_cq_ex.unwrap()(context, cq_attr))
+        (*vctx).create_cq_ex.unwrap()(context, cq_attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -748,14 +716,14 @@ pub unsafe fn ibv_create_qp_ex(
 pub unsafe fn ibv_alloc_td(
     context: *mut ibv_context,
     init_attr: *mut ibv_td_init_attr,
-) -> Option<*mut ibv_td> {
+) -> *mut ibv_td {
     let vcr = verbs_get_ctx_op!(context, alloc_td);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).alloc_td.unwrap()(context, init_attr))
+        (*vctx).alloc_td.unwrap()(context, init_attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 

@@ -1,6 +1,20 @@
+use bindgen::callbacks::{ItemInfo, ItemKind, ParseCallbacks};
 use cmake::Config;
 use std::env;
 use std::path::PathBuf;
+
+#[derive(Debug)]
+struct CompatParseCallback {}
+
+impl ParseCallbacks for CompatParseCallback {
+    fn generated_name_override(&self, item_info: ItemInfo<'_>) -> Option<String> {
+        match (item_info.name, item_info.kind) {
+            // add _compat suffix for some functions
+            ("ibv_query_port", ItemKind::Function) => Some(String::from("ibv_query_port_compat")),
+            _ => None,
+        }
+    }
+}
 
 fn main() {
     let dst = Config::new("rdma-core-mummy")
@@ -126,6 +140,7 @@ fn main() {
         .formatter(bindgen::Formatter::Prettyplease)
         .size_t_is_usize(true)
         .disable_untagged_union()
+        .parse_callbacks(Box::new(CompatParseCallback {}))
         .generate()
         .expect("Unable to generate bindings");
 

@@ -293,7 +293,7 @@ macro_rules! verbs_get_ctx_op {
 
 // ibv_context related inline function
 #[inline]
-pub unsafe fn ___ibv_query_port(
+pub unsafe fn ibv_query_port(
     context: *mut ibv_context,
     port_num: u8,
     port_attr: *mut ibv_port_attr,
@@ -309,16 +309,32 @@ pub unsafe fn ___ibv_query_port(
     }
 }
 
+#[inline]
+pub unsafe fn ibv_query_gid_table(
+    context: *mut ibv_context,
+    entries: *mut ibv_gid_entry,
+    max_entries: usize,
+    flags: u32,
+) -> isize {
+    _ibv_query_gid_table(
+        context,
+        entries,
+        max_entries,
+        flags,
+        mem::size_of_val(&*entries),
+    )
+}
+
 // ibv_flow related inline functions
 #[inline]
-pub unsafe fn ibv_create_flow(qp: *mut ibv_qp, flow: *mut ibv_flow_attr) -> Option<*mut ibv_flow> {
+pub unsafe fn ibv_create_flow(qp: *mut ibv_qp, flow: *mut ibv_flow_attr) -> *mut ibv_flow {
     let vcr = verbs_get_ctx_op!((*qp).context, ibv_create_flow);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).ibv_create_flow.unwrap()(qp, flow))
+        (*vctx).ibv_create_flow.unwrap()(qp, flow)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -337,14 +353,14 @@ pub unsafe fn ibv_destroy_flow(flow_id: *mut ibv_flow) -> c_int {
 pub unsafe fn ibv_create_flow_action_esp(
     ctx: *mut ibv_context,
     esp: *mut ibv_flow_action_esp_attr,
-) -> Option<*mut ibv_flow_action> {
+) -> *mut ibv_flow_action {
     let vcr = verbs_get_ctx_op!(ctx, create_flow_action_esp);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).create_flow_action_esp.unwrap()(ctx, esp))
+        (*vctx).create_flow_action_esp.unwrap()(ctx, esp)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -378,14 +394,14 @@ pub unsafe fn ibv_destroy_flow_action(action: *mut ibv_flow_action) -> c_int {
 pub unsafe fn ibv_open_xrcd(
     context: *mut ibv_context,
     xrcd_init_attr: *mut ibv_xrcd_init_attr,
-) -> Option<*mut ibv_xrcd> {
+) -> *mut ibv_xrcd {
     let vcr = verbs_get_ctx_op!(context, open_xrcd);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).open_xrcd.unwrap()(context, xrcd_init_attr))
+        (*vctx).open_xrcd.unwrap()(context, xrcd_init_attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -396,65 +412,17 @@ pub unsafe fn ibv_close_xrcd(xrcd: *mut ibv_xrcd) -> c_int {
     (*vctx.unwrap()).close_xrcd.unwrap()(xrcd)
 }
 
-// use new ibv_reg_mr version only if access flags that require it are used
-#[inline]
-pub unsafe fn __ibv_reg_mr(
-    pd: *mut ibv_pd,
-    addr: *mut c_void,
-    length: usize,
-    access: c_uint,
-    is_access_const: c_int,
-) -> *mut ibv_mr {
-    if is_access_const != 0
-        && (ib_uverbs_access_flags(access)
-            & ib_uverbs_access_flags::IB_UVERBS_ACCESS_OPTIONAL_RANGE)
-            == ib_uverbs_access_flags(0)
-    {
-        ibv_reg_mr(pd, addr, length, access as c_int)
-    } else {
-        ibv_reg_mr_iova2(pd, addr, length, addr as u64, access)
-    }
-}
-// TODO: handle C macro defined function
-// #define ibv_reg_mr(pd, addr, length, access) \
-//     __ibv_reg_mr(pd, addr, length, access,      \
-//              __builtin_constant_p(              \
-//                  ((access) & IBV_ACCESS_OPTIONAL_RANGE) == 0))
-
-// use new ibv_reg_mr version only if access flags that require it are used
-#[inline]
-pub unsafe fn __ibv_reg_mr_iova(
-    pd: *mut ibv_pd,
-    addr: *mut c_void,
-    length: usize,
-    iova: u64,
-    access: c_uint,
-    is_access_const: c_int,
-) -> *mut ibv_mr {
-    if is_access_const != 0
-        && (ib_uverbs_access_flags(access)
-            & ib_uverbs_access_flags::IB_UVERBS_ACCESS_OPTIONAL_RANGE)
-            == ib_uverbs_access_flags(0)
-    {
-        ibv_reg_mr_iova(pd, addr, length, iova, access as c_int)
-    } else {
-        ibv_reg_mr_iova2(pd, addr, length, iova, access)
-    }
-}
-// TODO: handle C macro defined function
-// #define ibv_reg_mr_iova(pd, addr, length, iova, access)                        \
-//     __ibv_reg_mr_iova(pd, addr, length, iova, access,                      \
-//               __builtin_constant_p(                                \
-//                   ((access) & IBV_ACCESS_OPTIONAL_RANGE) == 0))
+// compatibility for ibv_reg_mr is already handled in rdma-core-mummy;
+// so we do not need another layer of indirection any more.
 
 // ibv_mw related inline functions
 #[inline]
-pub unsafe fn ibv_alloc_mw(pd: *mut ibv_pd, type_: ibv_mw_type::Type) -> Option<*mut ibv_mw> {
+pub unsafe fn ibv_alloc_mw(pd: *mut ibv_pd, type_: ibv_mw_type::Type) -> *mut ibv_mw {
     if (*(*pd).context).ops.alloc_mw.is_some() {
-        Some((*(*pd).context).ops.alloc_mw.unwrap()(pd, type_))
+        (*(*pd).context).ops.alloc_mw.unwrap()(pd, type_)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -500,17 +468,14 @@ pub unsafe fn ibv_advise_mr(
 
 // ibv_dm related inline functions
 #[inline]
-pub unsafe fn ibv_alloc_dm(
-    context: *mut ibv_context,
-    attr: *mut ibv_alloc_dm_attr,
-) -> Option<*mut ibv_dm> {
+pub unsafe fn ibv_alloc_dm(context: *mut ibv_context, attr: *mut ibv_alloc_dm_attr) -> *mut ibv_dm {
     let vcr = verbs_get_ctx_op!(context, alloc_dm);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).alloc_dm.unwrap()(context, attr))
+        (*vctx).alloc_dm.unwrap()(context, attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -546,14 +511,14 @@ pub unsafe fn ibv_memcpy_from_dm(
 }
 
 #[inline]
-pub unsafe fn ibv_alloc_null_mr(pd: *mut ibv_pd) -> Option<*mut ibv_mr> {
+pub unsafe fn ibv_alloc_null_mr(pd: *mut ibv_pd) -> *mut ibv_mr {
     let vcr = verbs_get_ctx_op!((*pd).context, alloc_null_mr);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).alloc_null_mr.unwrap()(pd))
+        (*vctx).alloc_null_mr.unwrap()(pd)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -564,16 +529,14 @@ pub unsafe fn ibv_reg_dm_mr(
     dm_offset: u64,
     length: usize,
     access: u32,
-) -> Option<*mut ibv_mr> {
+) -> *mut ibv_mr {
     let vcr = verbs_get_ctx_op!((*pd).context, reg_dm_mr);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).reg_dm_mr.unwrap()(
-            pd, dm, dm_offset, length, access,
-        ))
+        (*vctx).reg_dm_mr.unwrap()(pd, dm, dm_offset, length, access)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -620,7 +583,7 @@ pub unsafe fn ibv_modify_cq(cq: *mut ibv_cq, attr: *mut ibv_modify_cq_attr) -> c
 pub unsafe fn ibv_create_srq_ex(
     context: *mut ibv_context,
     srq_init_attr_ex: *mut ibv_srq_init_attr_ex,
-) -> Option<*mut ibv_srq> {
+) -> *mut ibv_srq {
     let mask = ibv_srq_init_attr_mask((*srq_init_attr_ex).comp_mask);
     let mask_inv = ibv_srq_init_attr_mask(!(*srq_init_attr_ex).comp_mask);
     let zero = ibv_srq_init_attr_mask(0);
@@ -634,18 +597,18 @@ pub unsafe fn ibv_create_srq_ex(
         && ((mask & ibv_srq_init_attr_mask::IBV_SRQ_INIT_ATTR_TYPE) != zero
             || ((*srq_init_attr_ex).srq_type == ibv_srq_type::IBV_SRQT_BASIC));
     if cond {
-        Some(ibv_create_srq(
+        ibv_create_srq(
             (*srq_init_attr_ex).pd,
             srq_init_attr_ex as *mut ibv_srq_init_attr,
-        ))
+        )
     } else {
         let vcr = verbs_get_ctx_op!(context, create_srq_ex);
 
         if let Some(vctx) = vcr {
-            Some((*vctx).create_srq_ex.unwrap()(context, srq_init_attr_ex))
+            (*vctx).create_srq_ex.unwrap()(context, srq_init_attr_ex)
         } else {
             *libc::__errno_location() = libc::EOPNOTSUPP;
-            None
+            ptr::null_mut()
         }
     }
 }
@@ -691,22 +654,22 @@ pub unsafe fn ibv_post_srq_ops(
 pub unsafe fn ibv_create_qp_ex(
     context: *mut ibv_context,
     qp_init_attr_ex: *mut ibv_qp_init_attr_ex,
-) -> Option<*mut ibv_qp> {
+) -> *mut ibv_qp {
     let mask = ibv_qp_init_attr_mask((*qp_init_attr_ex).comp_mask);
 
     if mask == ibv_qp_init_attr_mask::IBV_QP_INIT_ATTR_PD {
-        Some(ibv_create_qp(
+        ibv_create_qp(
             (*qp_init_attr_ex).pd,
             qp_init_attr_ex as *mut ibv_qp_init_attr,
-        ))
+        )
     } else {
         let vcr = verbs_get_ctx_op!(context, create_qp_ex);
 
         if let Some(vctx) = vcr {
-            Some((*vctx).create_qp_ex.unwrap()(context, qp_init_attr_ex))
+            (*vctx).create_qp_ex.unwrap()(context, qp_init_attr_ex)
         } else {
             *libc::__errno_location() = libc::EOPNOTSUPP;
-            None
+            ptr::null_mut()
         }
     }
 }
@@ -743,14 +706,14 @@ pub unsafe fn ibv_dealloc_td(td: *mut ibv_td) -> c_int {
 pub unsafe fn ibv_alloc_parent_domain(
     context: *mut ibv_context,
     attr: *mut ibv_parent_domain_init_attr,
-) -> Option<*mut ibv_pd> {
+) -> *mut ibv_pd {
     let vcr = verbs_get_ctx_op!(context, alloc_parent_domain);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).alloc_parent_domain.unwrap()(context, attr))
+        (*vctx).alloc_parent_domain.unwrap()(context, attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -793,14 +756,14 @@ pub unsafe fn ibv_query_device_ex(
 pub unsafe fn ibv_open_qp(
     context: *mut ibv_context,
     qp_open_attr: *mut ibv_qp_open_attr,
-) -> Option<*mut ibv_qp> {
+) -> *mut ibv_qp {
     let vcr = verbs_get_ctx_op!(context, open_qp);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).open_qp.unwrap()(context, qp_open_attr))
+        (*vctx).open_qp.unwrap()(context, qp_open_attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -823,26 +786,24 @@ pub unsafe fn ibv_modify_qp_rate_limit(
 pub unsafe fn ibv_create_wq(
     context: *mut ibv_context,
     wq_init_attr: *mut ibv_wq_init_attr,
-) -> Option<*mut ibv_wq> {
+) -> *mut ibv_wq {
     let vcr = verbs_get_ctx_op!(context, create_wq);
 
     if let Some(vctx) = vcr {
         let wq = (*vctx).create_wq.unwrap()(context, wq_init_attr);
-        if wq != (ptr::null::<ibv_wq>() as *mut _) {
+        if !wq.is_null() {
+            (*wq).wq_context = (*wq_init_attr).wq_context;
             (*wq).events_completed = 0;
             libc::pthread_mutex_init(
                 &mut (*wq).mutex,
-                ptr::null::<libc::pthread_mutexattr_t>() as *mut _,
+                ptr::null_mut::<libc::pthread_mutexattr_t>(),
             );
-            libc::pthread_cond_init(
-                &mut (*wq).cond,
-                ptr::null::<libc::pthread_condattr_t>() as *mut _,
-            );
+            libc::pthread_cond_init(&mut (*wq).cond, ptr::null_mut::<libc::pthread_condattr_t>());
         }
-        Some(wq)
+        wq
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -873,14 +834,14 @@ pub unsafe fn ibv_destroy_wq(wq: *mut ibv_wq) -> c_int {
 pub unsafe fn ibv_create_rwq_ind_table(
     context: *mut ibv_context,
     init_attr: *mut ibv_rwq_ind_table_init_attr,
-) -> Option<*mut ibv_rwq_ind_table> {
+) -> *mut ibv_rwq_ind_table {
     let vcr = verbs_get_ctx_op!(context, create_rwq_ind_table);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).create_rwq_ind_table.unwrap()(context, init_attr))
+        (*vctx).create_rwq_ind_table.unwrap()(context, init_attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 
@@ -925,14 +886,14 @@ pub unsafe fn ibv_is_qpt_supported(caps: u32, qpt: ibv_qp_type::Type) -> c_int {
 pub unsafe fn ibv_create_counters(
     context: *mut ibv_context,
     init_attr: *mut ibv_counters_init_attr,
-) -> Option<*mut ibv_counters> {
+) -> *mut ibv_counters {
     let vcr = verbs_get_ctx_op!(context, create_counters);
 
     if let Some(vctx) = vcr {
-        Some((*vctx).create_counters.unwrap()(context, init_attr))
+        (*vctx).create_counters.unwrap()(context, init_attr)
     } else {
         *libc::__errno_location() = libc::EOPNOTSUPP;
-        None
+        ptr::null_mut()
     }
 }
 

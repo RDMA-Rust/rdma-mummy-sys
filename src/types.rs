@@ -49,6 +49,7 @@ pub struct ibv_async_event {
 
 // ibv_wc related union and struct types
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub union imm_data_invalidated_rkey_union_t {
     /// When (wc_flags & IBV_WC_WITH_IMM): Immediate data in network byte order.
     pub imm_data: __be32,
@@ -57,6 +58,7 @@ pub union imm_data_invalidated_rkey_union_t {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct ibv_wc {
     pub wr_id: u64,
     pub status: ibv_wc_status::Type,

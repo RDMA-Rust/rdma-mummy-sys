@@ -1,6 +1,6 @@
 [package]
 name = "rdma-mummy-sys"
-version = "0.2.0"
+version = "0.2.1"
 authors = [
     "Luke Yue <lukedyue@gmail.com>",
     "Pu Wang <nicolas.weeks@gmail.com>",

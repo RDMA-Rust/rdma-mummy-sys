@@ -310,6 +310,24 @@ pub unsafe fn ibv_query_port(
 }
 
 #[inline]
+pub unsafe fn ibv_query_gid_ex(
+    context: *mut ibv_context,
+    port_num: u32,
+    gid_index: u32,
+    entry: *mut ibv_gid_entry,
+    flags: u32,
+) -> i32 {
+    _ibv_query_gid_ex(
+        context,
+        port_num,
+        gid_index,
+        entry,
+        flags,
+        mem::size_of_val(&*entry),
+    )
+}
+
+#[inline]
 pub unsafe fn ibv_query_gid_table(
     context: *mut ibv_context,
     entries: *mut ibv_gid_entry,

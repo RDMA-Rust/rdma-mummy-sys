@@ -16,12 +16,12 @@ pub unsafe fn ibv_wr_atomic_cmp_swp(
     compare: u64,
     swap: u64,
 ) {
-    (*qp).wr_atomic_cmp_swp.unwrap()(qp, rkey, remote_addr, compare, swap);
+    (*qp).wr_atomic_cmp_swp.unwrap_uncheck()(qp, rkey, remote_addr, compare, swap);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_atomic_fetch_add(qp: *mut ibv_qp_ex, rkey: u32, remote_addr: u64, add: u64) {
-    (*qp).wr_atomic_fetch_add.unwrap()(qp, rkey, remote_addr, add);
+    (*qp).wr_atomic_fetch_add.unwrap_uncheck()(qp, rkey, remote_addr, add);
 }
 
 #[inline]
@@ -31,22 +31,22 @@ pub unsafe fn ibv_wr_bind_mw(
     rkey: u32,
     bind_info: *const ibv_mw_bind_info,
 ) {
-    (*qp).wr_bind_mw.unwrap()(qp, mw, rkey, bind_info);
+    (*qp).wr_bind_mw.unwrap_uncheck()(qp, mw, rkey, bind_info);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_local_inv(qp: *mut ibv_qp_ex, invalidate_rkey: u32) {
-    (*qp).wr_local_inv.unwrap()(qp, invalidate_rkey);
+    (*qp).wr_local_inv.unwrap_uncheck()(qp, invalidate_rkey);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_rdma_read(qp: *mut ibv_qp_ex, rkey: u32, remote_addr: u64) {
-    (*qp).wr_rdma_read.unwrap()(qp, rkey, remote_addr);
+    (*qp).wr_rdma_read.unwrap_uncheck()(qp, rkey, remote_addr);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_rdma_write(qp: *mut ibv_qp_ex, rkey: u32, remote_addr: u64) {
-    (*qp).wr_rdma_write.unwrap()(qp, rkey, remote_addr);
+    (*qp).wr_rdma_write.unwrap_uncheck()(qp, rkey, remote_addr);
 }
 
 #[inline]
@@ -56,27 +56,27 @@ pub unsafe fn ibv_wr_rdma_write_imm(
     remote_addr: u64,
     imm_data: __be32,
 ) {
-    (*qp).wr_rdma_write_imm.unwrap()(qp, rkey, remote_addr, imm_data);
+    (*qp).wr_rdma_write_imm.unwrap_uncheck()(qp, rkey, remote_addr, imm_data);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_send(qp: *mut ibv_qp_ex) {
-    (*qp).wr_send.unwrap()(qp);
+    (*qp).wr_send.unwrap_uncheck()(qp);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_send_imm(qp: *mut ibv_qp_ex, imm_data: __be32) {
-    (*qp).wr_send_imm.unwrap()(qp, imm_data);
+    (*qp).wr_send_imm.unwrap_uncheck()(qp, imm_data);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_send_inv(qp: *mut ibv_qp_ex, invalidate_rkey: u32) {
-    (*qp).wr_send_inv.unwrap()(qp, invalidate_rkey);
+    (*qp).wr_send_inv.unwrap_uncheck()(qp, invalidate_rkey);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_send_tso(qp: *mut ibv_qp_ex, hdr: *mut c_void, hdr_sz: u16, mss: u16) {
-    (*qp).wr_send_tso.unwrap()(qp, hdr, hdr_sz, mss);
+    (*qp).wr_send_tso.unwrap_uncheck()(qp, hdr, hdr_sz, mss);
 }
 
 #[inline]
@@ -86,17 +86,17 @@ pub unsafe fn ibv_wr_set_ud_addr(
     remote_qpn: u32,
     remote_qkey: u32,
 ) {
-    (*qp).wr_set_ud_addr.unwrap()(qp, ah, remote_qpn, remote_qkey);
+    (*qp).wr_set_ud_addr.unwrap_uncheck()(qp, ah, remote_qpn, remote_qkey);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_set_xrc_srqn(qp: *mut ibv_qp_ex, remote_srqn: u32) {
-    (*qp).wr_set_xrc_srqn.unwrap()(qp, remote_srqn);
+    (*qp).wr_set_xrc_srqn.unwrap_uncheck()(qp, remote_srqn);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_set_inline_data(qp: *mut ibv_qp_ex, addr: *mut c_void, length: usize) {
-    (*qp).wr_set_inline_data.unwrap()(qp, addr, length);
+    (*qp).wr_set_inline_data.unwrap_uncheck()(qp, addr, length);
 }
 
 #[inline]
@@ -105,32 +105,32 @@ pub unsafe fn ibv_wr_set_inline_data_list(
     num_buf: usize,
     buf_list: *const ibv_data_buf,
 ) {
-    (*qp).wr_set_inline_data_list.unwrap()(qp, num_buf, buf_list);
+    (*qp).wr_set_inline_data_list.unwrap_uncheck()(qp, num_buf, buf_list);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_set_sge(qp: *mut ibv_qp_ex, lkey: u32, addr: u64, length: u32) {
-    (*qp).wr_set_sge.unwrap()(qp, lkey, addr, length);
+    (*qp).wr_set_sge.unwrap_uncheck()(qp, lkey, addr, length);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_set_sge_list(qp: *mut ibv_qp_ex, num_sge: usize, sg_list: *const ibv_sge) {
-    (*qp).wr_set_sge_list.unwrap()(qp, num_sge, sg_list);
+    (*qp).wr_set_sge_list.unwrap_uncheck()(qp, num_sge, sg_list);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_start(qp: *mut ibv_qp_ex) {
-    (*qp).wr_start.unwrap()(qp);
+    (*qp).wr_start.unwrap_uncheck()(qp);
 }
 
 #[inline]
 pub unsafe fn ibv_wr_complete(qp: *mut ibv_qp_ex) -> c_int {
-    (*qp).wr_complete.unwrap()(qp)
+    (*qp).wr_complete.unwrap_uncheck()(qp)
 }
 
 #[inline]
 pub unsafe fn ibv_wr_abort(qp: *mut ibv_qp_ex) {
-    (*qp).wr_abort.unwrap()(qp)
+    (*qp).wr_abort.unwrap_uncheck()(qp)
 }
 
 // ibv_cq_ex related inline functions
@@ -141,37 +141,37 @@ pub unsafe fn ibv_cq_ex_to_cq(cq: *mut ibv_cq_ex) -> *mut ibv_cq {
 
 #[inline]
 pub unsafe fn ibv_start_poll(cq: *mut ibv_cq_ex, attr: *mut ibv_poll_cq_attr) -> c_int {
-    (*cq).start_poll.unwrap()(cq, attr)
+    (*cq).start_poll.unwrap_uncheck()(cq, attr)
 }
 
 #[inline]
 pub unsafe fn ibv_next_poll(cq: *mut ibv_cq_ex) -> c_int {
-    (*cq).next_poll.unwrap()(cq)
+    (*cq).next_poll.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_end_poll(cq: *mut ibv_cq_ex) {
-    (*cq).end_poll.unwrap()(cq)
+    (*cq).end_poll.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_opcode(cq: *mut ibv_cq_ex) -> ibv_wc_opcode::Type {
-    (*cq).read_opcode.unwrap()(cq)
+    (*cq).read_opcode.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_vendor_err(cq: *mut ibv_cq_ex) -> u32 {
-    (*cq).read_vendor_err.unwrap()(cq)
+    (*cq).read_vendor_err.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_byte_len(cq: *mut ibv_cq_ex) -> u32 {
-    (*cq).read_byte_len.unwrap()(cq)
+    (*cq).read_byte_len.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_imm_data(cq: *mut ibv_cq_ex) -> __be32 {
-    (*cq).read_imm_data.unwrap()(cq)
+    (*cq).read_imm_data.unwrap_uncheck()(cq)
 }
 
 #[inline]
@@ -181,62 +181,62 @@ pub unsafe fn ibv_wc_read_invalidated_rkey(cq: *mut ibv_cq_ex) -> u32 {
     // #else
     //     return cq->read_imm_data(cq);
     // #endif
-    (*cq).read_imm_data.unwrap()(cq)
+    (*cq).read_imm_data.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_qp_num(cq: *mut ibv_cq_ex) -> u32 {
-    (*cq).read_qp_num.unwrap()(cq)
+    (*cq).read_qp_num.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_src_qp(cq: *mut ibv_cq_ex) -> u32 {
-    (*cq).read_src_qp.unwrap()(cq)
+    (*cq).read_src_qp.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_wc_flags(cq: *mut ibv_cq_ex) -> c_uint {
-    (*cq).read_wc_flags.unwrap()(cq)
+    (*cq).read_wc_flags.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_slid(cq: *mut ibv_cq_ex) -> u32 {
-    (*cq).read_slid.unwrap()(cq)
+    (*cq).read_slid.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_sl(cq: *mut ibv_cq_ex) -> u8 {
-    (*cq).read_sl.unwrap()(cq)
+    (*cq).read_sl.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_dlid_path_bits(cq: *mut ibv_cq_ex) -> u8 {
-    (*cq).read_dlid_path_bits.unwrap()(cq)
+    (*cq).read_dlid_path_bits.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_completion_ts(cq: *mut ibv_cq_ex) -> u64 {
-    (*cq).read_completion_ts.unwrap()(cq)
+    (*cq).read_completion_ts.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_completion_wallclock_ns(cq: *mut ibv_cq_ex) -> u64 {
-    (*cq).read_completion_wallclock_ns.unwrap()(cq)
+    (*cq).read_completion_wallclock_ns.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_cvlan(cq: *mut ibv_cq_ex) -> u16 {
-    (*cq).read_cvlan.unwrap()(cq)
+    (*cq).read_cvlan.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_flow_tag(cq: *mut ibv_cq_ex) -> u32 {
-    (*cq).read_flow_tag.unwrap()(cq)
+    (*cq).read_flow_tag.unwrap_uncheck()(cq)
 }
 
 #[inline]
 pub unsafe fn ibv_wc_read_tm_info(cq: *mut ibv_cq_ex, tm_info: *mut ibv_wc_tm_info) {
-    (*cq).read_tm_info.unwrap()(cq, tm_info)
+    (*cq).read_tm_info.unwrap_uncheck()(cq, tm_info)
 }
 
 // ibv_wq related inline function
@@ -246,7 +246,7 @@ pub unsafe fn ibv_post_wq_recv(
     recv_wr: *mut ibv_recv_wr,
     bad_recv_wr: *mut *mut ibv_recv_wr,
 ) -> c_int {
-    (*wq).post_recv.unwrap()(wq, recv_wr, bad_recv_wr)
+    (*wq).post_recv.unwrap_uncheck()(wq, recv_wr, bad_recv_wr)
 }
 
 // Use intrusive_collections::container_of! instread, once it's stable not nightly
@@ -628,7 +628,7 @@ pub unsafe fn ibv_create_cq_ex(
 // ibv_cq related inline functions
 #[inline]
 pub unsafe fn ibv_poll_cq(cq: *mut ibv_cq, num_entries: i32, wc: *mut ibv_wc) -> c_int {
-    (*(*cq).context).ops.poll_cq.unwrap()(cq, num_entries, wc)
+    (*(*cq).context).ops.poll_cq.unwrap_uncheck()(cq, num_entries, wc)
 }
 
 #[inline]
@@ -935,7 +935,7 @@ pub unsafe fn ibv_post_send(
     wr: *mut ibv_send_wr,
     bad_wr: *mut *mut ibv_send_wr,
 ) -> c_int {
-    (*(*qp).context).ops.post_send.unwrap()(qp, wr, bad_wr)
+    (*(*qp).context).ops.post_send.unwrap_uncheck()(qp, wr, bad_wr)
 }
 
 #[inline]
@@ -944,7 +944,7 @@ pub unsafe fn ibv_post_recv(
     wr: *mut ibv_recv_wr,
     bad_wr: *mut *mut ibv_recv_wr,
 ) -> c_int {
-    (*(*qp).context).ops.post_recv.unwrap()(qp, wr, bad_wr)
+    (*(*qp).context).ops.post_recv.unwrap_uncheck()(qp, wr, bad_wr)
 }
 
 #[inline]

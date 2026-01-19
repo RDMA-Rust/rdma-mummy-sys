@@ -31,7 +31,7 @@ fn main() {
 
     let bindings = bindgen::Builder::default()
         .header("src/bindings.h")
-        .clang_arg("-F./rdma-core-mummy/include")
+        .clang_arg("-I./rdma-core-mummy/include")
         .allowlist_function("ibv_.*")
         .allowlist_function("_ibv_.*")
         .allowlist_type("ibv_.*")

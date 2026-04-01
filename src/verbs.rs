@@ -3,7 +3,7 @@ use crate::*;
 use std::mem;
 use std::ptr;
 
-/// Inline functions from <infiniband/verbs.h>
+// Inline functions from <infiniband/verbs.h>
 
 pub type ibv_advise_mr_advice = ib_uverbs_advise_mr_advice::Type;
 
@@ -136,7 +136,7 @@ pub unsafe fn ibv_wr_abort(qp: *mut ibv_qp_ex) {
 // ibv_cq_ex related inline functions
 #[inline]
 pub unsafe fn ibv_cq_ex_to_cq(cq: *mut ibv_cq_ex) -> *mut ibv_cq {
-    cq as *mut ibv_cq_ex as *mut ibv_cq
+    cq as *mut ibv_cq
 }
 
 #[inline]
@@ -957,7 +957,7 @@ pub unsafe fn ibv_read_counters(
     }
 }
 
-/// Inline functions from <rdma/rdma_cma.h>
+// Inline functions from <rdma/rdma_cma.h>
 
 pub const RDMA_IB_IP_PS_MASK: u64 = 0xFFFFFFFFFFFF0000;
 pub const RDMA_IB_IP_PORT_MASK: u64 = 0x000000000000FFFF;
@@ -982,8 +982,7 @@ pub unsafe fn rdma_get_peer_addr(id: &rdma_cm_id) -> &libc::sockaddr {
     &id.route.addr.dst_addr_union.dst_addr
 }
 
-/// Inline functions from <rdma/rdma_verbs.h>
-
+// Inline functions from <rdma/rdma_verbs.h>
 #[inline]
 pub unsafe fn rdma_seterrno(ret: c_int) -> c_int {
     if ret != 0 {

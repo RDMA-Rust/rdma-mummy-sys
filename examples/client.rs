@@ -65,7 +65,7 @@ fn run(ip: &CString, port: &CString) -> i32 {
     }
 
     let mut send_mr = null_mut();
-    if (send_flags & ibv_send_flags::IBV_SEND_INLINE.0) as u32 == 0 {
+    if (send_flags & ibv_send_flags::IBV_SEND_INLINE.0) == 0 {
         println!("flags {:?}", send_flags);
         send_mr = unsafe { rdma_reg_msgs(id, send_msg.as_mut_ptr().cast(), 16) };
         if send_mr.is_null() {
@@ -80,7 +80,7 @@ fn run(ip: &CString, port: &CString) -> i32 {
     ret = unsafe { rdma_post_recv(id, null_mut(), recv_msg.as_mut_ptr().cast(), 16, mr) };
     if ret != 0 {
         println!("rdma_post_recv");
-        if (send_flags & ibv_send_flags::IBV_SEND_INLINE.0) as u32 == 0 {
+        if (send_flags & ibv_send_flags::IBV_SEND_INLINE.0) == 0 {
             unsafe { rdma_dereg_mr(send_mr) };
         }
         return ret;

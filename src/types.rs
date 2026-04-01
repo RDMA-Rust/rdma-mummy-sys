@@ -1,9 +1,9 @@
 use crate::*;
 
-/// This file defines the types directly or indirectly involving union,
-/// in that BindGen cannot handle union very well, so mannually define them.
+// This file defines the types directly or indirectly involving union,
+// in that BindGen cannot handle union very well, so manually define them.
 
-/// Struct types involve union in <infiniband/verbs.h>
+// Struct types involve union in <infiniband/verbs.h>
 
 // ibv_gid related union and struct types
 #[repr(C)]
@@ -233,7 +233,7 @@ pub struct ibv_flow_spec {
     pub ibv_flow_spec_union: ibv_flow_spec_union_t,
 }
 
-/// Struct types involve union in <rdma/rdma_cma.h>
+// Struct types involve union in <rdma/rdma_cma.h>
 
 // rdma_addr related union and struct types
 #[repr(C)]
@@ -272,8 +272,7 @@ pub struct rdma_addr {
     pub addr: addr_union_t,
 }
 
-/// rdma_cm_event related union and struct types
-
+// rdma_cm_event related union and struct types
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct ibv_ah_attr {

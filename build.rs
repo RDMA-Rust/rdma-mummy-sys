@@ -22,7 +22,10 @@ fn main() {
         .build_target("all")
         .build();
 
-    println!("cargo:rustc-link-search=native={}", dst.join("build").display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("build").display()
+    );
     println!("cargo:rustc-link-lib=static=ibverbs");
     println!("cargo:rustc-link-lib=static=rdmacm");
 
@@ -143,7 +146,9 @@ fn main() {
 
     let dest_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("bindings.rs");
 
-    bindings.write_to_file(dest_path).expect("Unable to generate bindings");
+    bindings
+        .write_to_file(dest_path)
+        .expect("Unable to generate bindings");
 
     // Generate mlx5dv bindings when the mlx5 feature is enabled.
     // Requires system-installed mlx5 provider (MLNX_OFED or rdma-core with mlx5).

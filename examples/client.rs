@@ -21,7 +21,8 @@ fn run(ip: &CString, port: &CString) -> i32 {
     let mut res: *mut rdma_addrinfo = null_mut();
 
     hints.ai_port_space = rdma_port_space::RDMA_PS_TCP as i32;
-    let mut ret = unsafe { rdma_getaddrinfo(ip.as_ptr().cast(), port.as_ptr().cast(), &hints, &mut res) };
+    let mut ret =
+        unsafe { rdma_getaddrinfo(ip.as_ptr().cast(), port.as_ptr().cast(), &hints, &mut res) };
 
     if ret != 0 {
         println!("rdma_getaddrinfo");
@@ -152,9 +153,15 @@ fn main() {
     let ret = run(ip, port);
 
     if ret != 0 {
-        println!("rdma_client: ret error {:?}", std::io::Error::from_raw_os_error(-ret));
+        println!(
+            "rdma_client: ret error {:?}",
+            std::io::Error::from_raw_os_error(-ret)
+        );
         if ret == -1 {
-            println!("rdma_client: last os error {:?}", std::io::Error::last_os_error());
+            println!(
+                "rdma_client: last os error {:?}",
+                std::io::Error::last_os_error()
+            );
         }
     }
     println!("rdma_client: end");

@@ -24,14 +24,7 @@ fn run() -> i32 {
     let mut res: *mut rdma_addrinfo = null_mut();
     hints.ai_flags = RAI_PASSIVE.try_into().unwrap();
     hints.ai_port_space = rdma_port_space::RDMA_PS_TCP.try_into().unwrap();
-    let mut ret = unsafe {
-        rdma_getaddrinfo(
-            SERVER.as_ptr().cast(),
-            PORT.as_ptr().cast(),
-            &hints,
-            &mut res,
-        )
-    };
+    let mut ret = unsafe { rdma_getaddrinfo(SERVER.as_ptr().cast(), PORT.as_ptr().cast(), &hints, &mut res) };
 
     if ret != 0 {
         println!("rdma_getaddrinfo");
@@ -186,15 +179,9 @@ fn main() {
     println!("rdma_server: start");
     let ret = run();
     if ret != 0 {
-        println!(
-            "rdma_server: ret error {:?}",
-            std::io::Error::from_raw_os_error(-ret)
-        );
+        println!("rdma_server: ret error {:?}", std::io::Error::from_raw_os_error(-ret));
         if ret == -1 {
-            println!(
-                "rdma_server: last os error {:?}",
-                std::io::Error::last_os_error()
-            );
+            println!("rdma_server: last os error {:?}", std::io::Error::last_os_error());
         }
     }
     println!("rdma_server: end");

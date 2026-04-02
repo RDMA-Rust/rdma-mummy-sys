@@ -9,13 +9,7 @@ pub type ibv_advise_mr_advice = ib_uverbs_advise_mr_advice::Type;
 
 // ibv_qp_ex related inline functions
 #[inline]
-pub unsafe fn ibv_wr_atomic_cmp_swp(
-    qp: *mut ibv_qp_ex,
-    rkey: u32,
-    remote_addr: u64,
-    compare: u64,
-    swap: u64,
-) {
+pub unsafe fn ibv_wr_atomic_cmp_swp(qp: *mut ibv_qp_ex, rkey: u32, remote_addr: u64, compare: u64, swap: u64) {
     (*qp).wr_atomic_cmp_swp.unwrap_unchecked()(qp, rkey, remote_addr, compare, swap);
 }
 
@@ -25,12 +19,7 @@ pub unsafe fn ibv_wr_atomic_fetch_add(qp: *mut ibv_qp_ex, rkey: u32, remote_addr
 }
 
 #[inline]
-pub unsafe fn ibv_wr_bind_mw(
-    qp: *mut ibv_qp_ex,
-    mw: *mut ibv_mw,
-    rkey: u32,
-    bind_info: *const ibv_mw_bind_info,
-) {
+pub unsafe fn ibv_wr_bind_mw(qp: *mut ibv_qp_ex, mw: *mut ibv_mw, rkey: u32, bind_info: *const ibv_mw_bind_info) {
     (*qp).wr_bind_mw.unwrap_unchecked()(qp, mw, rkey, bind_info);
 }
 
@@ -50,12 +39,7 @@ pub unsafe fn ibv_wr_rdma_write(qp: *mut ibv_qp_ex, rkey: u32, remote_addr: u64)
 }
 
 #[inline]
-pub unsafe fn ibv_wr_rdma_write_imm(
-    qp: *mut ibv_qp_ex,
-    rkey: u32,
-    remote_addr: u64,
-    imm_data: __be32,
-) {
+pub unsafe fn ibv_wr_rdma_write_imm(qp: *mut ibv_qp_ex, rkey: u32, remote_addr: u64, imm_data: __be32) {
     (*qp).wr_rdma_write_imm.unwrap_unchecked()(qp, rkey, remote_addr, imm_data);
 }
 
@@ -80,12 +64,7 @@ pub unsafe fn ibv_wr_send_tso(qp: *mut ibv_qp_ex, hdr: *mut c_void, hdr_sz: u16,
 }
 
 #[inline]
-pub unsafe fn ibv_wr_set_ud_addr(
-    qp: *mut ibv_qp_ex,
-    ah: *mut ibv_ah,
-    remote_qpn: u32,
-    remote_qkey: u32,
-) {
+pub unsafe fn ibv_wr_set_ud_addr(qp: *mut ibv_qp_ex, ah: *mut ibv_ah, remote_qpn: u32, remote_qkey: u32) {
     (*qp).wr_set_ud_addr.unwrap_unchecked()(qp, ah, remote_qpn, remote_qkey);
 }
 
@@ -100,11 +79,7 @@ pub unsafe fn ibv_wr_set_inline_data(qp: *mut ibv_qp_ex, addr: *mut c_void, leng
 }
 
 #[inline]
-pub unsafe fn ibv_wr_set_inline_data_list(
-    qp: *mut ibv_qp_ex,
-    num_buf: usize,
-    buf_list: *const ibv_data_buf,
-) {
+pub unsafe fn ibv_wr_set_inline_data_list(qp: *mut ibv_qp_ex, num_buf: usize, buf_list: *const ibv_data_buf) {
     (*qp).wr_set_inline_data_list.unwrap_unchecked()(qp, num_buf, buf_list);
 }
 
@@ -252,8 +227,7 @@ pub unsafe fn ibv_post_wq_recv(
 // Use intrusive_collections::container_of! instread, once it's stable not nightly
 macro_rules! container_of {
     ($ptr:expr, $container:path, $field:ident) => {{
-        ($ptr as *const _ as *const u8).sub(memoffset::offset_of!($container, $field))
-            as *const $container
+        ($ptr as *const _ as *const u8).sub(memoffset::offset_of!($container, $field)) as *const $container
     }};
 }
 
@@ -293,11 +267,7 @@ macro_rules! verbs_get_ctx_op {
 
 // ibv_context related inline function
 #[inline]
-pub unsafe fn ibv_query_port(
-    context: *mut ibv_context,
-    port_num: u8,
-    port_attr: *mut ibv_port_attr,
-) -> c_int {
+pub unsafe fn ibv_query_port(context: *mut ibv_context, port_num: u8, port_attr: *mut ibv_port_attr) -> c_int {
     let vcr = verbs_get_ctx_op!(context, query_port);
 
     if let Some(vctx) = vcr {
@@ -317,14 +287,7 @@ pub unsafe fn ibv_query_gid_ex(
     entry: *mut ibv_gid_entry,
     flags: u32,
 ) -> i32 {
-    _ibv_query_gid_ex(
-        context,
-        port_num,
-        gid_index,
-        entry,
-        flags,
-        mem::size_of_val(&*entry),
-    )
+    _ibv_query_gid_ex(context, port_num, gid_index, entry, flags, mem::size_of_val(&*entry))
 }
 
 #[inline]
@@ -334,13 +297,7 @@ pub unsafe fn ibv_query_gid_table(
     max_entries: usize,
     flags: u32,
 ) -> isize {
-    _ibv_query_gid_table(
-        context,
-        entries,
-        max_entries,
-        flags,
-        mem::size_of_val(&*entries),
-    )
+    _ibv_query_gid_table(context, entries, max_entries, flags, mem::size_of_val(&*entries))
 }
 
 // ibv_flow related inline functions
@@ -383,10 +340,7 @@ pub unsafe fn ibv_create_flow_action_esp(
 }
 
 #[inline]
-pub unsafe fn ibv_modify_flow_action_esp(
-    action: *mut ibv_flow_action,
-    esp: *mut ibv_flow_action_esp_attr,
-) -> c_int {
+pub unsafe fn ibv_modify_flow_action_esp(action: *mut ibv_flow_action, esp: *mut ibv_flow_action_esp_attr) -> c_int {
     let vcr = verbs_get_ctx_op!((*action).context, modify_flow_action_esp);
 
     if let Some(vctx) = vcr {
@@ -409,10 +363,7 @@ pub unsafe fn ibv_destroy_flow_action(action: *mut ibv_flow_action) -> c_int {
 
 // ibv_xrcd related inline functions
 #[inline]
-pub unsafe fn ibv_open_xrcd(
-    context: *mut ibv_context,
-    xrcd_init_attr: *mut ibv_xrcd_init_attr,
-) -> *mut ibv_xrcd {
+pub unsafe fn ibv_open_xrcd(context: *mut ibv_context, xrcd_init_attr: *mut ibv_xrcd_init_attr) -> *mut ibv_xrcd {
     let vcr = verbs_get_ctx_op!(context, open_xrcd);
 
     if let Some(vctx) = vcr {
@@ -509,22 +460,12 @@ pub unsafe fn ibv_free_dm(dm: *mut ibv_dm) -> c_int {
 }
 
 #[inline]
-pub unsafe fn ibv_memcpy_to_dm(
-    dm: *mut ibv_dm,
-    dm_offset: u64,
-    host_addr: *const c_void,
-    length: usize,
-) -> c_int {
+pub unsafe fn ibv_memcpy_to_dm(dm: *mut ibv_dm, dm_offset: u64, host_addr: *const c_void, length: usize) -> c_int {
     (*dm).memcpy_to_dm.unwrap()(dm, dm_offset, host_addr, length)
 }
 
 #[inline]
-pub unsafe fn ibv_memcpy_from_dm(
-    host_addr: *mut c_void,
-    dm: *mut ibv_dm,
-    dm_offset: u64,
-    length: usize,
-) -> c_int {
+pub unsafe fn ibv_memcpy_from_dm(host_addr: *mut c_void, dm: *mut ibv_dm, dm_offset: u64, length: usize) -> c_int {
     (*dm).memcpy_from_dm.unwrap()(host_addr, dm, dm_offset, length)
 }
 
@@ -560,10 +501,7 @@ pub unsafe fn ibv_reg_dm_mr(
 
 // ibv_cq_ex related inline function
 #[inline]
-pub unsafe fn ibv_create_cq_ex(
-    context: *mut ibv_context,
-    cq_attr: *mut ibv_cq_init_attr_ex,
-) -> *mut ibv_cq_ex {
+pub unsafe fn ibv_create_cq_ex(context: *mut ibv_context, cq_attr: *mut ibv_cq_init_attr_ex) -> *mut ibv_cq_ex {
     let vcr = verbs_get_ctx_op!(context, create_cq_ex);
 
     if let Some(vctx) = vcr {
@@ -608,17 +546,13 @@ pub unsafe fn ibv_create_srq_ex(
 
     // TODO: verify the condition
     let cond = (mask_inv
-        | (ibv_srq_init_attr_mask::IBV_SRQ_INIT_ATTR_PD
-            & ibv_srq_init_attr_mask::IBV_SRQ_INIT_ATTR_TYPE))
+        | (ibv_srq_init_attr_mask::IBV_SRQ_INIT_ATTR_PD & ibv_srq_init_attr_mask::IBV_SRQ_INIT_ATTR_TYPE))
         != zero
         && (mask & ibv_srq_init_attr_mask::IBV_SRQ_INIT_ATTR_PD) != zero
         && ((mask & ibv_srq_init_attr_mask::IBV_SRQ_INIT_ATTR_TYPE) != zero
             || ((*srq_init_attr_ex).srq_type == ibv_srq_type::IBV_SRQT_BASIC));
     if cond {
-        ibv_create_srq(
-            (*srq_init_attr_ex).pd,
-            srq_init_attr_ex as *mut ibv_srq_init_attr,
-        )
+        ibv_create_srq((*srq_init_attr_ex).pd, srq_init_attr_ex as *mut ibv_srq_init_attr)
     } else {
         let vcr = verbs_get_ctx_op!(context, create_srq_ex);
 
@@ -652,11 +586,7 @@ pub unsafe fn ibv_post_srq_recv(
 }
 
 #[inline]
-pub unsafe fn ibv_post_srq_ops(
-    srq: *mut ibv_srq,
-    op: *mut ibv_ops_wr,
-    bad_op: *mut *mut ibv_ops_wr,
-) -> c_int {
+pub unsafe fn ibv_post_srq_ops(srq: *mut ibv_srq, op: *mut ibv_ops_wr, bad_op: *mut *mut ibv_ops_wr) -> c_int {
     let vcr = verbs_get_ctx_op!((*srq).context, post_srq_ops);
 
     if let Some(vctx) = vcr {
@@ -669,17 +599,11 @@ pub unsafe fn ibv_post_srq_ops(
 
 // ibv_qp related inline functions
 #[inline]
-pub unsafe fn ibv_create_qp_ex(
-    context: *mut ibv_context,
-    qp_init_attr_ex: *mut ibv_qp_init_attr_ex,
-) -> *mut ibv_qp {
+pub unsafe fn ibv_create_qp_ex(context: *mut ibv_context, qp_init_attr_ex: *mut ibv_qp_init_attr_ex) -> *mut ibv_qp {
     let mask = ibv_qp_init_attr_mask((*qp_init_attr_ex).comp_mask);
 
     if mask == ibv_qp_init_attr_mask::IBV_QP_INIT_ATTR_PD {
-        ibv_create_qp(
-            (*qp_init_attr_ex).pd,
-            qp_init_attr_ex as *mut ibv_qp_init_attr,
-        )
+        ibv_create_qp((*qp_init_attr_ex).pd, qp_init_attr_ex as *mut ibv_qp_init_attr)
     } else {
         let vcr = verbs_get_ctx_op!(context, create_qp_ex);
 
@@ -694,10 +618,7 @@ pub unsafe fn ibv_create_qp_ex(
 
 // ibv_td related inline functions
 #[inline]
-pub unsafe fn ibv_alloc_td(
-    context: *mut ibv_context,
-    init_attr: *mut ibv_td_init_attr,
-) -> *mut ibv_td {
+pub unsafe fn ibv_alloc_td(context: *mut ibv_context, init_attr: *mut ibv_td_init_attr) -> *mut ibv_td {
     let vcr = verbs_get_ctx_op!(context, alloc_td);
 
     if let Some(vctx) = vcr {
@@ -737,10 +658,7 @@ pub unsafe fn ibv_alloc_parent_domain(
 
 // device related inline functions
 #[inline]
-pub unsafe fn ibv_query_rt_values_ex(
-    context: *mut ibv_context,
-    values: *mut ibv_values_ex,
-) -> c_int {
+pub unsafe fn ibv_query_rt_values_ex(context: *mut ibv_context, values: *mut ibv_values_ex) -> c_int {
     let vcr = verbs_get_ctx_op!(context, query_rt_values);
 
     if let Some(vctx) = vcr {
@@ -771,10 +689,7 @@ pub unsafe fn ibv_query_device_ex(
 
 // ibv_qp related inline functions
 #[inline]
-pub unsafe fn ibv_open_qp(
-    context: *mut ibv_context,
-    qp_open_attr: *mut ibv_qp_open_attr,
-) -> *mut ibv_qp {
+pub unsafe fn ibv_open_qp(context: *mut ibv_context, qp_open_attr: *mut ibv_qp_open_attr) -> *mut ibv_qp {
     let vcr = verbs_get_ctx_op!(context, open_qp);
 
     if let Some(vctx) = vcr {
@@ -786,10 +701,7 @@ pub unsafe fn ibv_open_qp(
 }
 
 #[inline]
-pub unsafe fn ibv_modify_qp_rate_limit(
-    qp: *mut ibv_qp,
-    attr: *mut ibv_qp_rate_limit_attr,
-) -> c_int {
+pub unsafe fn ibv_modify_qp_rate_limit(qp: *mut ibv_qp, attr: *mut ibv_qp_rate_limit_attr) -> c_int {
     let vcr = verbs_get_ctx_op!((*qp).context, modify_qp_rate_limit);
 
     if let Some(vctx) = vcr {
@@ -801,10 +713,7 @@ pub unsafe fn ibv_modify_qp_rate_limit(
 
 // ibv_wq related inline functions
 #[inline]
-pub unsafe fn ibv_create_wq(
-    context: *mut ibv_context,
-    wq_init_attr: *mut ibv_wq_init_attr,
-) -> *mut ibv_wq {
+pub unsafe fn ibv_create_wq(context: *mut ibv_context, wq_init_attr: *mut ibv_wq_init_attr) -> *mut ibv_wq {
     let vcr = verbs_get_ctx_op!(context, create_wq);
 
     if let Some(vctx) = vcr {
@@ -812,10 +721,7 @@ pub unsafe fn ibv_create_wq(
         if !wq.is_null() {
             (*wq).wq_context = (*wq_init_attr).wq_context;
             (*wq).events_completed = 0;
-            libc::pthread_mutex_init(
-                &mut (*wq).mutex,
-                ptr::null_mut::<libc::pthread_mutexattr_t>(),
-            );
+            libc::pthread_mutex_init(&mut (*wq).mutex, ptr::null_mut::<libc::pthread_mutexattr_t>());
             libc::pthread_cond_init(&mut (*wq).cond, ptr::null_mut::<libc::pthread_condattr_t>());
         }
         wq
@@ -877,20 +783,12 @@ pub unsafe fn ibv_destroy_rwq_ind_table(rwq_ind_table: *mut ibv_rwq_ind_table) -
 // If IBV_SEND_INLINE flag is set, the data buffers can be reused
 // immediately after the call returns.
 #[inline]
-pub unsafe fn ibv_post_send(
-    qp: *mut ibv_qp,
-    wr: *mut ibv_send_wr,
-    bad_wr: *mut *mut ibv_send_wr,
-) -> c_int {
+pub unsafe fn ibv_post_send(qp: *mut ibv_qp, wr: *mut ibv_send_wr, bad_wr: *mut *mut ibv_send_wr) -> c_int {
     (*(*qp).context).ops.post_send.unwrap_unchecked()(qp, wr, bad_wr)
 }
 
 #[inline]
-pub unsafe fn ibv_post_recv(
-    qp: *mut ibv_qp,
-    wr: *mut ibv_recv_wr,
-    bad_wr: *mut *mut ibv_recv_wr,
-) -> c_int {
+pub unsafe fn ibv_post_recv(qp: *mut ibv_qp, wr: *mut ibv_recv_wr, bad_wr: *mut *mut ibv_recv_wr) -> c_int {
     (*(*qp).context).ops.post_recv.unwrap_unchecked()(qp, wr, bad_wr)
 }
 
@@ -1009,8 +907,7 @@ pub unsafe fn rdma_reg_read(id: *mut rdma_cm_id, addr: *mut c_void, length: usiz
         (*id).pd,
         addr,
         length,
-        (ibv_access_flags::IBV_ACCESS_LOCAL_WRITE | ibv_access_flags::IBV_ACCESS_REMOTE_READ).0
-            as c_int,
+        (ibv_access_flags::IBV_ACCESS_LOCAL_WRITE | ibv_access_flags::IBV_ACCESS_REMOTE_READ).0 as c_int,
     )
 }
 
@@ -1020,8 +917,7 @@ pub unsafe fn rdma_reg_write(id: *mut rdma_cm_id, addr: *mut c_void, length: usi
         (*id).pd,
         addr,
         length,
-        (ibv_access_flags::IBV_ACCESS_LOCAL_WRITE | ibv_access_flags::IBV_ACCESS_REMOTE_WRITE).0
-            as c_int,
+        (ibv_access_flags::IBV_ACCESS_LOCAL_WRITE | ibv_access_flags::IBV_ACCESS_REMOTE_WRITE).0 as c_int,
     )
 }
 
@@ -1031,12 +927,7 @@ pub unsafe fn rdma_dereg_mr(mr: *mut ibv_mr) -> c_int {
 }
 
 #[inline]
-pub unsafe fn rdma_post_recvv(
-    id: *mut rdma_cm_id,
-    context: *mut c_void,
-    sgl: *mut ibv_sge,
-    nsge: c_int,
-) -> c_int {
+pub unsafe fn rdma_post_recvv(id: *mut rdma_cm_id, context: *mut c_void, sgl: *mut ibv_sge, nsge: c_int) -> c_int {
     let mut wr = ibv_recv_wr {
         wr_id: context as u64,
         next: ptr::null::<ibv_recv_wr>() as *mut _,

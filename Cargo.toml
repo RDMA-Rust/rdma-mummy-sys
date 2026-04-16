@@ -18,6 +18,9 @@ memoffset = "0.9"
 paste = "1.0"
 # intrusive-collections = "0.9"
 
+[features]
+mlx5 = []
+
 [build-dependencies]
 cmake = "0.1"
 bindgen = { version = "0.66", features = ["prettyplease"] }

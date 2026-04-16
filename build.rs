@@ -148,5 +148,47 @@ fn main() {
 
     bindings
         .write_to_file(dest_path)
-        .expect("Couldn't write bindings");
+        .expect("Unable to generate bindings");
+
+    // Generate mlx5dv bindings when the mlx5 feature is enabled.
+    // Requires system-installed mlx5 provider (MLNX_OFED or rdma-core with mlx5).
+    #[cfg(feature = "mlx5")]
+    {
+        println!("cargo:rustc-link-lib=mlx5");
+
+        let mlx5_bindings = bindgen::Builder::default()
+            .header("src/mlx5dv_bindings.h")
+            .clang_arg("-I./rdma-core-mummy/include")
+            .allowlist_function("mlx5dv_.*")
+            .allowlist_type("mlx5dv_.*")
+            .allowlist_type("MLX5DV_.*")
+            .allowlist_var("MLX5DV_.*")
+            // Don't blocklist ibv types — mlx5dv references them.
+            // They'll be generated as opaque types in this module.
+            .blocklist_type("in6_addr")
+            .blocklist_type("sockaddr.*")
+            .blocklist_type("timespec")
+            .opaque_type("pthread_.*")
+            .opaque_type("ibv_context")
+            .opaque_type("ibv_pd")
+            .opaque_type("ibv_cq")
+            .opaque_type("ibv_qp")
+            .opaque_type("ibv_srq")
+            .opaque_type("ibv_wq")
+            .opaque_type("ibv_rwq_ind_table")
+            .derive_copy(true)
+            .derive_debug(false)
+            .derive_default(false)
+            .generate_comments(false)
+            .prepend_enum_name(false)
+            .formatter(bindgen::Formatter::Prettyplease)
+            .size_t_is_usize(true)
+            .generate()
+            .expect("Unable to generate mlx5dv bindings");
+
+        let mlx5_dest = PathBuf::from(env::var("OUT_DIR").unwrap()).join("mlx5dv_bindings.rs");
+        mlx5_bindings
+            .write_to_file(mlx5_dest)
+            .expect("Unable to write mlx5dv bindings");
+    }
 }

@@ -5,6 +5,7 @@
     clippy::too_many_arguments,
     clippy::non_canonical_clone_impl
 )]
+#![allow(unnecessary_transmutes)]
 
 use libc::*;
 

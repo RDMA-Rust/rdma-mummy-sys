@@ -11,10 +11,12 @@ use libc::*;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
+mod mlx5dv;
 mod opcode;
 mod types;
 mod verbs;
 
+pub use self::mlx5dv::*;
 pub use self::opcode::*;
 pub use self::types::*;
 pub use self::verbs::*;

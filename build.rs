@@ -28,6 +28,7 @@ fn main() {
     );
     println!("cargo:rustc-link-lib=static=ibverbs");
     println!("cargo:rustc-link-lib=static=rdmacm");
+    println!("cargo:rustc-link-lib=static=mlx5");
 
     let bindings = bindgen::Builder::default()
         .header("src/bindings.h")
@@ -38,6 +39,9 @@ fn main() {
         .allowlist_function("rdma_.*")
         .allowlist_type("rdma_.*")
         .allowlist_type("verbs_.*")
+        .allowlist_function("mlx5dv_(create_qp|query_device|qp_ex_from_ibv_qp_ex|set_context_attr|query_qp_lag_port|modify_qp_lag_port|modify_qp_udp_sport|get_clock_info)")
+        .allowlist_type("mlx5dv_.*")
+        .allowlist_var("MLX5.*")
         .allowlist_type("ib_uverbs_access_flags")
         //.allowlist_type("verbs_devices_ops")
         //.allowlist_var("verbs_provider_.*")
@@ -100,6 +104,8 @@ fn main() {
         .bitfield_enum("ib_uverbs_access_flags")
         .bitfield_enum("rdma_cm_join_mc_attr_mask")
         .bitfield_enum("rdma_cm_mc_join_flags")
+        .bitfield_enum("mlx5dv_.*flags.*")
+        .bitfield_enum("mlx5dv_.*mask.*")
         // Following ENUM will be const in a sub-mod
         .constified_enum_module("ibv_node_type")
         .constified_enum_module("ibv_transport_type")
@@ -148,5 +154,5 @@ fn main() {
 
     bindings
         .write_to_file(dest_path)
-        .expect("Couldn't write bindings");
+        .expect("Unable to write bindings");
 }

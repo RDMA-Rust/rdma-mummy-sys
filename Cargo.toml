@@ -20,4 +20,4 @@ paste = "1.0"
 
 [build-dependencies]
 cmake = "0.1"
-bindgen = { version = "0.66", features = ["prettyplease"] }
+bindgen = { version = "0.72.1", features = ["prettyplease"] }
